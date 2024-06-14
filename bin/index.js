@@ -1,14 +1,31 @@
 import inquirer from 'inquirer';
+import chalk from 'chalk';
+
 import shell from 'shelljs';
 import path from 'path';
-import chalk from 'chalk';
 import fs from 'fs';
 
-export function index() {
+import docker from './docker.js';
+
+const actions = Object.freeze({
+    'clear': '清空未使用镜像(空间不足时使用)',
+    'rollback': '回滚',
+    'deploy': '部署'
+})
+
+export async function index() {
+    // 获取携带参数
+    const param = process.argv[2]
+    if (param !== '' && !actions.hasOwnProperty(param)) {
+        console.log(chalk.yellowBright.bold('参数无效！请检查后重新执行命令！'))
+        return
+    }
+
     // 引导欢迎信息
     console.log(chalk.yellowBright.bold('🌟---------------------------------------🌟\n    👏 欢迎使用自动构建部署工具 ---Maosi 👏    \n🌟---------------------------------------🌟'));
 
     // 链接docker
+    await docker();
 
     // 根据参数执行清空镜像还是回滚还是部署
 
