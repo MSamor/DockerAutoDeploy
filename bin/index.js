@@ -8,19 +8,13 @@ export function index() {
     // 引导欢迎信息
     console.log(chalk.yellowBright.bold('🌟---------------------------------------🌟\n    👏 欢迎使用自动构建部署工具 ---Maosi 👏    \n🌟---------------------------------------🌟'));
 
-    // 链接服务器，上传dockerfile和打包数据
+    // 链接docker
 
-    // 执行构建或部署命令
-    const action = process.argv[2]
-    if (action === 'build') {
+    // 根据参数执行清空镜像还是回滚还是部署
 
-    }
+    // 填写容器镜像[前缀]，保存本地，只需要填一次
 
-    if (action === 'deploy') {
-
-    }
-
-    // 询问构建还是部署
+    // 执行部署命令
     const promptList = [{
         type: 'list',
         message: '请选择一种水果:',
