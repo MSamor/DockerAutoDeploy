@@ -1,0 +1,14 @@
+{
+  "public": [
+    "111",
+    "222",
+    "333"
+  ],
+  "private": [{
+    "username": "u",
+    "password": "p",
+    "url": "https://github.com/Maosi"
+  }],
+  "host": "47.109.46.214",
+  "port": "2375"
+}

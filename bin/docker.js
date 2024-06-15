@@ -3,13 +3,12 @@ import inquirer from "inquirer";
 import Docker from 'dockerode';
 import fs from 'fs';
 import ora from 'ora';
-const oraLoading = ora('连接中,请稍后...')
+const oraLoading = ora(chalk.yellowBright.bold('连接中,请稍后...\n'))
 
 export default async function docker() {
     console.log(chalk.yellowBright.bold('正在链接docker...'))
 
     // 链接docker
-
     const promptList = [{
         type: 'input',
         message: '请输入服务器地址:',
@@ -25,6 +24,7 @@ export default async function docker() {
         type: 'input',
         message: '请输入端口号:',
         name: 'port',
+        default: "2375",
         validate: function(val) {
             if(val.match(/\d/g)) {
                 return true;
@@ -62,6 +62,7 @@ export default async function docker() {
                 process.exit()
             }
             oraLoading.stop();
+            console.log(chalk.yellowBright.bold('Docker服务器连接成功!'))
             resolve(containers);
         })
     })
