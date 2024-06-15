@@ -13,8 +13,12 @@
   "license": "ISC",
   "dependencies": {
     "chalk": "^5.3.0",
+    "dockerode": "^4.0.2",
     "inquirer": "^9.2.23",
     "shelljs": "^0.8.5"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "ora": "^8.0.1"
+  }
 }

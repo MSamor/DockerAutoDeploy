@@ -16,7 +16,7 @@ const actions = Object.freeze({
 export async function index() {
     // 获取携带参数
     const param = process.argv[2]
-    if (param !== '' && !actions.hasOwnProperty(param)) {
+    if (param === undefined || !actions.hasOwnProperty(param)) {
         console.log(chalk.yellowBright.bold('参数无效！请检查后重新执行命令！'))
         return
     }
@@ -25,28 +25,35 @@ export async function index() {
     console.log(chalk.yellowBright.bold('🌟---------------------------------------🌟\n    👏 欢迎使用自动构建部署工具 ---Maosi 👏    \n🌟---------------------------------------🌟'));
 
     // 链接docker
-    await docker();
+    let dockerInstance = await docker();
 
     // 根据参数执行清空镜像还是回滚还是部署
+    if (param === 'clear') {
+        // 清空未使用镜像
+    } else if (param === 'rollback') {
+        // 回滚
+    } else if (param === 'deploy') {
+        // 部署
+        // 填写容器镜像[前缀]，保存本地，只需要填一次
+        const imageName = 'nginx'
 
-    // 填写容器镜像[前缀]，保存本地，只需要填一次
+        // 执行部署命令
+        const promptList = [{
+            type: 'list',
+            message: '请选择一种水果:',
+            name: 'fruit',
+            choices: [
+                "Apple",
+                "Pear",
+                "Banana"
+            ],
+            filter: function (val) { // 使用filter将回答变为小写
+                return val.toLowerCase();
+            }
+        }];
 
-    // 执行部署命令
-    const promptList = [{
-        type: 'list',
-        message: '请选择一种水果:',
-        name: 'fruit',
-        choices: [
-            "Apple",
-            "Pear",
-            "Banana"
-        ],
-        filter: function (val) { // 使用filter将回答变为小写
-            return val.toLowerCase();
-        }
-    }];
-
-    inquirer.prompt(promptList).then(answers => {
-        console.log(answers);
-    })
+        inquirer.prompt(promptList).then(answers => {
+            console.log(answers);
+        })
+    }
 }
