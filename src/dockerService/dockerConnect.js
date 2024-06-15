@@ -5,7 +5,7 @@ import fs from 'fs';
 import ora from 'ora';
 const oraLoading = ora(chalk.yellowBright.bold('连接中,请稍后...\n'))
 
-export default async function docker() {
+export default async function dockerConnect() {
     console.log(chalk.yellowBright.bold('正在链接docker...'))
 
     // 链接docker

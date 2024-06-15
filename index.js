@@ -1,4 +1,4 @@
 #!/usr/bin/env node
 
-import {index} from './bin/index.js'
+import { index } from './src/index.js'
 index();
