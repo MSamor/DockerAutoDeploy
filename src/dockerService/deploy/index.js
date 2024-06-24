@@ -1,5 +1,6 @@
 import ora from "ora";
 import Chalk from "chalk";
+import chalk from "chalk";
 
 async function pullImage(dockerInstance,deployConfigRes) {
     return new Promise((resolve, reject) => {
@@ -48,8 +49,10 @@ async function createContainer(dockerInstance,deployConfigRes) {
 }
 
 export default async function deployService(dockerInstance,deployConfigRes) {
-
+    const oraLoading = ora(chalk.yellowBright.bold('容器构建启动中,请稍后...\n'))
+    oraLoading.start()
     await pullImage(dockerInstance,deployConfigRes);
+    oraLoading.stop()
 
     await createContainer(dockerInstance,deployConfigRes);
 
