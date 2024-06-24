@@ -3,7 +3,7 @@
     {
       "name": "腾讯云镜像",
       "imageName": "nginx",
-      "serveraddress": "https://registry.docker-cn.com"
+      "serveraddress": "docker.m.daocloud.io"
     },
     {
       "name": "腾讯云镜像2",

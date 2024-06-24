@@ -6,7 +6,7 @@ export default async function param() {
     const param = process.argv[2]
     if (param === undefined || !actions.hasOwnProperty(param)) {
         console.log(chalk.yellowBright.bold('参数无效！请检查后重新执行命令！'))
-        return
+        process.exit()
     }
     return param;
 }

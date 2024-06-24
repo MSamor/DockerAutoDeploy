@@ -23,13 +23,15 @@ export async function index() {
     if (scriptParam === 'clear') {
         // 清空未使用镜像
         // TODO
+    } else if (scriptParam === 'state') {
+        // 容器状态
+        // TODO
     } else if (scriptParam === 'rollback') {
         // 回滚
         // TODO
     } else if (scriptParam === 'deploy') {
         // 部署
        const deployConfigRes = await deployConfig(configJson);
-       console.log(deployConfigRes)
-        deployService(deployConfigRes);
+       deployService(dockerInstance,deployConfigRes);
     }
 }
