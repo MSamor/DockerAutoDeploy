@@ -5,6 +5,8 @@ export default async function deployConfig(configJson) {
     // 填写容器镜像名称
     let imageName = ''
     let imageUrl = ''
+    let hostPort = ''
+    let containerPort = ''
 
     let fullImageUrl = ''
     let auth = {}
@@ -35,6 +37,8 @@ export default async function deployConfig(configJson) {
         const image = getPublicByName(configJson, answers.image)
         imageName = image.name;
         imageUrl = image.serveraddress + '/' + image.imageName;
+        hostPort = image.hostPort;
+        containerPort = image.containerPort;
     } else if (answers.source === 'private') {
         // 从私有仓库拉取镜像
         const imageList = [{
@@ -49,6 +53,8 @@ export default async function deployConfig(configJson) {
         auth = image;
         imageName = image.imageName;
         imageUrl = image.serveraddress + '/' + image.imageName;
+        hostPort = image.hostPort;
+        containerPort = image.containerPort;
     }
 
     // 获取版本号
@@ -67,7 +73,9 @@ export default async function deployConfig(configJson) {
     return {
         imageName,
         fullImageUrl,
-        auth
+        auth,
+        hostPort,
+        containerPort
     }
 
 }

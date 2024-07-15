@@ -1,6 +1,6 @@
 import ora from "ora";
 import Chalk from "chalk";
-import chalk from "chalk";
+import inquirer from "inquirer";
 
 async function pullImage(dockerInstance,deployConfigRes) {
     return new Promise((resolve, reject) => {
@@ -21,16 +21,17 @@ async function pullImage(dockerInstance,deployConfigRes) {
 
 async function createContainer(dockerInstance,deployConfigRes) {
     return new Promise((resolve, reject) => {
-        // TODO 读取配置文件
+        const hostPort = `${deployConfigRes.hostPort}/tcp`;
         dockerInstance.createContainer({
-                Image: 'docker.m.daocloud.io/nginx:latest',
-                ExposedPorts:{'80/tcp':{}},
-                name: 'nginx-test', Tty: true,
+                // Image: 'docker.m.daocloud.io/nginx:latest',
+                Image: deployConfigRes.fullImageUrl,
+                ExposedPorts:{hostPort:{}},
+                name: deployConfigRes.name, Tty: true,
                 HostConfig:{
                     PortBindings:{
-                        "80/tcp":[
+                        hostPort:[
                             {
-                                "HostPort":"88"
+                                "HostPort":deployConfigRes.hostPort
                             }
                         ]
                     }
@@ -49,13 +50,20 @@ async function createContainer(dockerInstance,deployConfigRes) {
 }
 
 export default async function deployService(dockerInstance,deployConfigRes) {
-    const oraLoading = ora(chalk.yellowBright.bold('容器构建启动中,请稍后...\n'))
+    const oraLoading = ora(Chalk.yellowBright.bold('容器拉取中,请稍后...\n'))
     oraLoading.start()
     await pullImage(dockerInstance,deployConfigRes);
     oraLoading.stop()
 
-    await createContainer(dockerInstance,deployConfigRes);
-
-
-    // ora(Chalk.yellowBright.bold('部署中,请稍后...\n')).start()
+    const promp = [{
+        type: 'confirm',
+        message: '容器拉取完成，需要立即部署吗？',
+        name: 'confirmDeploy',
+    }]
+    const answers =await inquirer.prompt(promp)
+    if (answers.confirmDeploy) {
+        await createContainer(dockerInstance,deployConfigRes);
+    } else {
+        console.log(Chalk.yellowBright.bold('取消部署,需手动部署'))
+    }
 }

@@ -3,12 +3,16 @@
     {
       "name": "腾讯云镜像",
       "imageName": "nginx",
-      "serveraddress": "docker.m.daocloud.io"
+      "serveraddress": "docker.m.daocloud.io",
+      "hostPort": 80,
+      "containerPort": 80
     },
     {
       "name": "腾讯云镜像2",
       "imageName": "nginx",
-      "serveraddress": "https://registry.docker-cn.com"
+      "serveraddress": "https://registry.docker-cn.com",
+      "hostPort": 80,
+      "containerPort": 80
     }
   ],
   "private": [{
@@ -18,7 +22,9 @@
     "password": "p",
     "auth": "",
     "email": "your@email.email",
-    "serveraddress": "https://index.docker.io/v1"
+    "serveraddress": "https://index.docker.io/v1",
+    "hostPort": 80,
+    "containerPort": 80
   }],
   "host": "47.109.46.214",
   "port": "2375"

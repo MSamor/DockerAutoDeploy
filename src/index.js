@@ -30,7 +30,7 @@ export async function index() {
         // 回滚
         // TODO
     } else if (scriptParam === 'deploy') {
-        // 部署
+        // 拉取镜像
        const deployConfigRes = await deployConfig(configJson);
        deployService(dockerInstance,deployConfigRes);
     }
