@@ -20,7 +20,7 @@ export async function index() {
     let configJson = await config();
 
     // 链接docker
-    let dockerInstance = await dockerConnect();
+    const dockerInstance = await dockerConnect(configJson);
 
     // 根据参数执行清空镜像还是回滚还是部署
     if (scriptParam === 'clear') {
