@@ -5,6 +5,9 @@ import config from './fileConfig/index.js';
 import param from './executeConfig/param/index.js';
 import deployConfig from "./executeConfig/deploy/index.js";
 import deployService from "./dockerService/deploy/index.js";
+import clearUnusedImages from './dockerService/clear/index.js';
+import showContainersState from './dockerService/state/index.js';
+import rollbackContainer from './dockerService/rollback/index.js';
 
 export async function index() {
     // 获取携带参数
@@ -22,13 +25,13 @@ export async function index() {
     // 根据参数执行清空镜像还是回滚还是部署
     if (scriptParam === 'clear') {
         // 清空未使用镜像
-        // TODO
+        await clearUnusedImages(dockerInstance);
     } else if (scriptParam === 'state') {
-        // 容器状态
-        // TODO
+        // 显示所有的容器状态
+        await showContainersState(dockerInstance);
     } else if (scriptParam === 'rollback') {
-        // 回滚
-        // TODO
+        // 显示容器列表，选择指定容器，再选择已存在的版本，最后确认回滚
+        await rollbackContainer(dockerInstance);
     } else if (scriptParam === 'deploy') {
         // 拉取镜像
        const deployConfigRes = await deployConfig(configJson);
