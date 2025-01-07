@@ -7,6 +7,7 @@ export default async function deployConfig(configJson) {
     let imageUrl = ''
     let hostPort = ''
     let containerPort = ''
+    let selectedImage = null  
 
     let fullImageUrl = ''
     let auth = {}
@@ -27,43 +28,53 @@ export default async function deployConfig(configJson) {
 
     if (answers.source === 'public') {
         // 从公共仓库拉取镜像
+        const choices = configJson.public.map(imageItem => ({
+            name: `${imageItem.name} (${imageItem.imageName} @ ${imageItem.serveraddress})`,
+            value: imageItem.name
+        }));
+        
         const imageList = [{
             type: 'list',
             message: '请选择镜像',
             name: 'image',
-            choices: getPublicName(configJson),
+            choices,
         }]
-        const answers = await Inquirer.prompt(imageList)
-        const image = getPublicByName(configJson, answers.image)
-        imageName = image.name;
-        imageUrl = image.serveraddress + '/' + image.imageName;
-        hostPort = image.hostPort;
-        containerPort = image.containerPort;
+        const imageAnswer = await Inquirer.prompt(imageList)
+        selectedImage = getPublicByName(configJson, imageAnswer.image)
+        imageName = selectedImage.name;
+        imageUrl = selectedImage.serveraddress + '/' + selectedImage.imageName;
+        hostPort = selectedImage.hostPort;
+        containerPort = selectedImage.containerPort;
     } else if (answers.source === 'private') {
         // 从私有仓库拉取镜像
+        const choices = configJson.private.map(imageItem => ({
+            name: `${imageItem.name} (${imageItem.imageName} @ ${imageItem.serveraddress})`,
+            value: imageItem.name
+        }));
+
         const imageList = [{
             type: 'list',
             message: '请选择镜像',
             name: 'image',
-            choices: getPrivateName(configJson),
+            choices,
         }]
-        const answers = await Inquirer.prompt(imageList)
-        const image = getPrivateByName(configJson, answers.image)
+        const imageAnswer = await Inquirer.prompt(imageList)
+        selectedImage = getPrivateByName(configJson, imageAnswer.image)
 
-        auth = image;
-        imageName = image.imageName;
-        imageUrl = image.serveraddress + '/' + image.imageName;
-        hostPort = image.hostPort;
-        containerPort = image.containerPort;
+        auth = selectedImage;
+        imageName = selectedImage.imageName;
+        imageUrl = selectedImage.serveraddress + '/' + selectedImage.imageName;
+        hostPort = selectedImage.hostPort;
+        containerPort = selectedImage.containerPort;
     }
-
+    
     // 获取版本号
     const promptVersion = [
         {
             type: 'input',
             message: '请输入版本tag',
             name: 'tag',
-            default: "latest",
+            default: selectedImage.tag || "latest",
         },
     ];
     const version = await Inquirer.prompt(promptVersion)
@@ -77,5 +88,4 @@ export default async function deployConfig(configJson) {
         hostPort,
         containerPort
     }
-
 }
