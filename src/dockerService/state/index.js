@@ -1,15 +1,30 @@
 import Chalk from "chalk";
 
-function formatUptime(uptime) {
-    const days = Math.floor(uptime / (60 * 60 * 24));
-    const hours = Math.floor((uptime % (60 * 60 * 24)) / (60 * 60));
-    const minutes = Math.floor((uptime % (60 * 60)) / 60);
+function formatUptime(status) {
+    if (!status.includes('Up')) return '已停止';
     
-    let result = '';
-    if (days > 0) result += `${days}天`;
-    if (hours > 0) result += `${hours}小时`;
-    if (minutes > 0) result += `${minutes}分钟`;
-    return result || '刚刚启动';
+    const match = status.match(/Up\s+(\d+)\s+(\w+)/);
+    if (!match) return '刚刚启动';
+    
+    const [_, value, unit] = match;
+    const num = parseInt(value);
+    
+    switch(unit) {
+        case 'days':
+        case 'day':
+            return `${num}天`;
+        case 'hours':
+        case 'hour':
+            return `${num}小时`;
+        case 'minutes':
+        case 'minute':
+            return `${num}分钟`;
+        case 'seconds':
+        case 'second':
+            return num > 30 ? `${num}秒` : '刚刚启动';
+        default:
+            return '刚刚启动';
+    }
 }
 
 export default async function showContainersState(dockerInstance) {
@@ -33,18 +48,20 @@ export default async function showContainersState(dockerInstance) {
             containers.forEach(container => {
                 const name = container.Names[0].substring(1);
                 const status = container.State;
-                const uptime = container.Status.includes('Up') ? formatUptime(container.Status.match(/Up\s+(\d+)/)[1]) : '已停止';
+                const uptime = formatUptime(container.Status);
                 const ports = container.Ports.map(p => `${p.PublicPort}:${p.PrivatePort}`).join(', ') || '无';
                 
                 const statusColor = status === 'running' ? Chalk.green : Chalk.red;
                 
-                console.log(Chalk.white.bold(`容器名称: ${name}`));
-                console.log(`状态: ${statusColor(status)}`);
-                console.log(`运行时间: ${uptime}`);
-                console.log(`端口映射: ${ports}`);
-                console.log(Chalk.cyanBright.bold('----------------------------------------'));
+                console.log(
+                    Chalk.white.bold(`${name.padEnd(20)} `) +
+                    `[${statusColor(status.padEnd(8))}] ` +
+                    `运行时间: ${uptime.padEnd(15)} ` +
+                    `端口: ${ports}`
+                );
             });
             
+            console.log(Chalk.cyanBright.bold('----------------------------------------'));
             resolve();
         });
     });

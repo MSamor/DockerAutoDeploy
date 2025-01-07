@@ -63,23 +63,24 @@ async function createDockerInstance(config) {
 }
 
 export default async function dockerConnect(configJson) {
-    console.log(chalk.yellowBright.bold('正在连接docker...'));
-    const oraLoading = ora(chalk.yellowBright.bold('连接中,请稍后...\n'));
+    const oraLoading = ora({
+        text: chalk.yellowBright.bold('正在连接docker...'),
+        spinner: 'dots'
+    });
+    oraLoading.start();
 
     // 首先尝试使用配置文件中的设置
     if (configJson.host && configJson.port) {
         try {
-            oraLoading.start();
             const docker = await createDockerInstance({
                 host: configJson.host,
                 port: configJson.port
             });
             await tryConnect(docker);
-            oraLoading.stop();
-            console.log(chalk.greenBright.bold('Docker服务器连接成功!'));
+            oraLoading.succeed(chalk.greenBright.bold('Docker服务器连接成功!'));
             return docker;
         } catch (error) {
-            oraLoading.stop();
+            oraLoading.fail();
             console.log(chalk.yellowBright.bold('使用配置文件连接失败，请重新输入连接信息...'));
         }
     }
@@ -95,10 +96,9 @@ export default async function dockerConnect(configJson) {
             docker = await createDockerInstance(config);
             await tryConnect(docker);
             connected = true;
-            oraLoading.stop();
-            console.log(chalk.greenBright.bold('Docker服务器连接成功!'));
+            oraLoading.succeed(chalk.greenBright.bold('Docker服务器连接成功!'));
         } catch (error) {
-            oraLoading.stop();
+            oraLoading.fail();
             console.log(chalk.redBright.bold('连接失败：' + error.message));
             const { retry } = await inquirer.prompt([{
                 type: 'confirm',
