@@ -70,7 +70,7 @@ async function pullImage(dockerInstance, deployConfigRes, spinner) {
 
 async function createContainer(dockerInstance, deployConfigRes) {
     return new Promise((resolve, reject) => {
-        const containerPort = `${deployConfigRes.hostPort}/tcp`;
+        const containerPort = `${deployConfigRes.containerPort}/tcp`;
         const portBindings = {};
         portBindings[containerPort] = [{ HostPort: deployConfigRes.hostPort.toString() }];
 
@@ -130,15 +130,51 @@ export default async function deployService(dockerInstance, deployConfigRes) {
         oraLoading.stop()
     }
 
-    const promp = [{
+    const deployPrompt = [{
         type: 'confirm',
-        message: '容器拉取完成，需要立即部署吗？',
+        message: '容器拉取完成或已存在，需要立即部署吗？',
         name: 'confirmDeploy',
-    }]
-    const answers = await inquirer.prompt(promp)
+    }];
+    const answers = await inquirer.prompt(deployPrompt);
+    
     if (answers.confirmDeploy) {
+        // 端口配置确认
+        const portPrompt = [
+            {
+                type: 'input',
+                message: '请确认主机端口(Host Port)',
+                name: 'hostPort',
+                default: deployConfigRes.hostPort.toString(),
+                validate: function(value) {
+                    const port = parseInt(value);
+                    if (isNaN(port) || port < 1 || port > 65535) {
+                        return '请输入有效的端口号（1-65535）';
+                    }
+                    return true;
+                }
+            },
+            {
+                type: 'input',
+                message: '请确认容器端口(Container Port)',
+                name: 'containerPort',
+                default: deployConfigRes.containerPort.toString(),
+                validate: function(value) {
+                    const port = parseInt(value);
+                    if (isNaN(port) || port < 1 || port > 65535) {
+                        return '请输入有效的端口号（1-65535）';
+                    }
+                    return true;
+                }
+            }
+        ];
+        const portAnswers = await inquirer.prompt(portPrompt);
+        
+        // 更新端口配置
+        deployConfigRes.hostPort = parseInt(portAnswers.hostPort);
+        deployConfigRes.containerPort = parseInt(portAnswers.containerPort);
+
         await createContainer(dockerInstance, deployConfigRes);
     } else {
-        console.log(Chalk.yellowBright.bold('取消部署,需手动部署'))
+        console.log(Chalk.yellowBright.bold('取消部署,需手动部署'));
     }
 }
