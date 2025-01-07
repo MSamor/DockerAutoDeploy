@@ -37,7 +37,14 @@ export async function index() {
         const configJson = await config();
 
         // 引导欢迎信息
-        console.log(chalk.yellowBright.bold('🌟---------------------------------------🌟\n    👏 欢迎使用自动构建部署工具 ---Maosi 👏    \n🌟---------------------------------------🌟'));
+        console.log(chalk.cyanBright.bold(`
+╔══════════════════════════════════════════════╗
+║                                              ║
+║     🚀 Docker Auto Deploy System v1.0.0      ║
+║        Powered by ${chalk.greenBright('Maosi Technology')}           ║
+║                                              ║
+╚══════════════════════════════════════════════╝
+`));
         
         // 获取要执行的操作（从命令行或交互式菜单）
         const action = await param();
@@ -48,7 +55,7 @@ export async function index() {
         // 执行对应的操作
         await executeAction(action, dockerInstance, configJson);
     } catch (error) {
-        console.error(chalk.redBright.bold('执行过程中发生错误：', error.message));
+        // console.error(chalk.redBright.bold('执行过程中发生错误：', error.message));
         process.exit(1);
     }
 }

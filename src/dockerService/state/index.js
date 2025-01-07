@@ -47,6 +47,7 @@ export default async function showContainersState(dockerInstance) {
             
             containers.forEach(container => {
                 const name = container.Names[0].substring(1);
+                const id = container.Id.substring(0, 12); // 显示短 ID（前12位）
                 const status = container.State;
                 const uptime = formatUptime(container.Status);
                 const ports = container.Ports.map(p => `${p.PublicPort}:${p.PrivatePort}`).join(', ') || '无';
@@ -55,6 +56,7 @@ export default async function showContainersState(dockerInstance) {
                 
                 console.log(
                     Chalk.white.bold(`${name.padEnd(20)} `) +
+                    Chalk.gray(`${id.padEnd(15)}`) +
                     `[${statusColor(status.padEnd(8))}] ` +
                     `运行时间: ${uptime.padEnd(15)} ` +
                     `端口: ${ports}`

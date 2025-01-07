@@ -7,15 +7,36 @@ async function pullImage(dockerInstance, deployConfigRes, spinner) {
         const layers = {};
         
         dockerInstance.pull(deployConfigRes.fullImageUrl, function(err, stream) {
+            if (err) {
+                spinner.fail(Chalk.redBright.bold('镜像拉取失败：' + err.message));
+                reject(err);
+                return;
+            }
+
             dockerInstance.modem.followProgress(stream, onFinished, onProgress);
             
             function onFinished(err, output) {
-                console.log(Chalk.yellowBright.bold('镜像拉取完成'))
+                if (err) {
+                    spinner.fail(Chalk.redBright.bold('镜像拉取失败：' + err.message));
+                    reject(err);
+                    return;
+                }
+                spinner.succeed(Chalk.greenBright.bold('镜像拉取完成'));
                 resolve();
             }
             
             function onProgress(event) {
-                if (!event.id) return;
+                if (!event.id) {
+                    if (event.error) {
+                        spinner.fail(Chalk.redBright.bold('镜像拉取出错：' + event.error));
+                        reject(new Error(event.error));
+                        return;
+                    }
+                    if (event.status) {
+                        spinner.text = Chalk.white(event.status);
+                    }
+                    return;
+                }
 
                 layers[event.id] = event;
                 let output = '';
