@@ -11,9 +11,7 @@
     {
       "name": "腾讯云镜像2",
       "imageName": "nginx",
-      "serveraddress": "docker.1ms.run",
-      "hostPort": 80,
-      "containerPort": 80
+      "serveraddress": "docker.1ms.run"
     }
   ],
   "private": [{
@@ -21,7 +19,7 @@
     "imageName": "nginx",
     "username": "u",
     "password": "p",
-    "auth": "",
+    "auth": "111",
     "email": "your@email.email",
     "serveraddress": "index.docker.io/v1",
     "hostPort": 80,

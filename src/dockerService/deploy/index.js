@@ -144,7 +144,7 @@ export default async function deployService(dockerInstance, deployConfigRes) {
                 type: 'input',
                 message: '请确认主机端口(Host Port)',
                 name: 'hostPort',
-                default: deployConfigRes.hostPort.toString(),
+                default: deployConfigRes?.hostPort?.toString() || '80',
                 validate: function(value) {
                     const port = parseInt(value);
                     if (isNaN(port) || port < 1 || port > 65535) {
@@ -157,7 +157,7 @@ export default async function deployService(dockerInstance, deployConfigRes) {
                 type: 'input',
                 message: '请确认容器端口(Container Port)',
                 name: 'containerPort',
-                default: deployConfigRes.containerPort.toString(),
+                default: deployConfigRes?.containerPort?.toString() || '80',
                 validate: function(value) {
                     const port = parseInt(value);
                     if (isNaN(port) || port < 1 || port > 65535) {

@@ -35,6 +35,9 @@ export async function index() {
     try {
         // 获取配置文件
         const configJson = await config();
+        if (!configJson) {
+            process.exit(1);
+        }
 
         // 引导欢迎信息
         console.log(chalk.cyanBright.bold(`
