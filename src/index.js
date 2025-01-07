@@ -35,12 +35,12 @@ export async function index() {
     try {
         // 获取配置文件
         const configJson = await config();
+
+        // 引导欢迎信息
+        console.log(chalk.yellowBright.bold('🌟---------------------------------------🌟\n    👏 欢迎使用自动构建部署工具 ---Maosi 👏    \n🌟---------------------------------------🌟'));
         
         // 获取要执行的操作（从命令行或交互式菜单）
         const action = await param();
-        
-        // 引导欢迎信息
-        console.log(chalk.yellowBright.bold('🌟---------------------------------------🌟\n    👏 欢迎使用自动构建部署工具 ---Maosi 👏    \n🌟---------------------------------------🌟'));
 
         // 连接docker
         const dockerInstance = await dockerConnect(configJson);
