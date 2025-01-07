@@ -7,6 +7,7 @@ import showContainersState from './dockerService/state/index.js';
 import rollbackContainer from './dockerService/rollback/index.js';
 import deployService from "./dockerService/deploy/index.js";
 import deployConfig from "./executeConfig/deploy/index.js";
+import manageContainer from './dockerService/manage/index.js';
 
 async function executeAction(action, dockerInstance, configJson) {
     switch (action) {
@@ -18,6 +19,9 @@ async function executeAction(action, dockerInstance, configJson) {
             break;
         case 'rollback':
             await rollbackContainer(dockerInstance);
+            break;
+        case 'manage':
+            await manageContainer(dockerInstance);
             break;
         case 'deploy':
             const deployConfigRes = await deployConfig(configJson);
