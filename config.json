@@ -5,12 +5,13 @@
       "imageName": "nginx",
       "serveraddress": "docker.m.daocloud.io",
       "hostPort": 80,
-      "containerPort": 80
+      "containerPort": 80,
+      "tag": "latest"
     },
     {
       "name": "腾讯云镜像2",
       "imageName": "nginx",
-      "serveraddress": "https://registry.docker-cn.com",
+      "serveraddress": "docker.1ms.run",
       "hostPort": 80,
       "containerPort": 80
     }
@@ -22,7 +23,7 @@
     "password": "p",
     "auth": "",
     "email": "your@email.email",
-    "serveraddress": "https://index.docker.io/v1",
+    "serveraddress": "index.docker.io/v1",
     "hostPort": 80,
     "containerPort": 80
   }],

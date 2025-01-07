@@ -13,10 +13,18 @@ async function selectContainer(dockerInstance) {
         throw new Error('没有可用的容器');
     }
 
-    const choices = containers.map(container => ({
-        name: `${container.Names[0].substring(1)} (${container.State})`,
-        value: container.Names[0].substring(1)
-    }));
+    const choices = containers.map(container => {
+        const name = container.Names[0].substring(1);
+        const state = container.State;
+        const image = container.Image;
+        // 从镜像字符串中提取名称和标签
+        const [imageName, imageTag] = image.split(':').map(s => s.split('/').pop());
+        
+        return {
+            name: `${name} [${state}] (${imageName}:${imageTag || 'latest'})`,
+            value: name
+        };
+    });
 
     const { selectedContainer } = await inquirer.prompt([{
         type: 'list',
@@ -84,29 +92,55 @@ async function confirmRollback() {
 async function performRollback(dockerInstance, containerName, newImage) {
     const container = dockerInstance.getContainer(containerName);
     
+    // 获取原容器的配置
+    const containerInfo = await new Promise((resolve, reject) => {
+        container.inspect((err, data) => {
+            if (err) reject(err);
+            else resolve(data);
+        });
+    });
+
     console.log(Chalk.yellow.bold('正在停止容器...'));
     await new Promise((resolve, reject) => {
         container.stop((err) => {
+            if (err && err.statusCode !== 304) reject(err);
+            else resolve();
+        });
+    });
+
+    console.log(Chalk.yellow.bold('正在删除旧容器...'));
+    await new Promise((resolve, reject) => {
+        container.remove((err) => {
             if (err) reject(err);
             else resolve();
         });
     });
 
-    console.log(Chalk.yellow.bold('正在更新容器配置...'));
+    console.log(Chalk.yellow.bold('正在创建新容器...'));
+    const newContainer = await new Promise((resolve, reject) => {
+        // 使用原容器的配置创建新容器，但使用新的镜像
+        const createConfig = {
+            ...containerInfo.Config,
+            Image: newImage,
+            HostConfig: containerInfo.HostConfig,
+            name: containerName
+        };
+
+        dockerInstance.createContainer(createConfig, (err, container) => {
+            if (err) reject(err);
+            else resolve(container);
+        });
+    });
+
+    console.log(Chalk.yellow.bold('正在启动新容器...'));
     await new Promise((resolve, reject) => {
-        container.update({ Image: newImage }, (err) => {
+        newContainer.start((err) => {
             if (err) reject(err);
             else resolve();
         });
     });
 
-    console.log(Chalk.yellow.bold('正在启动容器...'));
-    await new Promise((resolve, reject) => {
-        container.start((err) => {
-            if (err) reject(err);
-            else resolve();
-        });
-    });
+    console.log(Chalk.green.bold('回滚完成！'));
 }
 
 export default async function rollbackContainer(dockerInstance) {
@@ -130,8 +164,7 @@ export default async function rollbackContainer(dockerInstance) {
         
         // 5. 执行回滚
         await performRollback(dockerInstance, containerName, targetVersion);
-        
-        console.log(Chalk.green.bold('回滚操作完成！'));
+
     } catch (error) {
         console.log(Chalk.red.bold('回滚失败：' + error.message));
         throw error;
