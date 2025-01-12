@@ -10,15 +10,29 @@
     "maosi": "./index.js"
   },
   "author": "Maosi",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "chalk": "^5.3.0",
     "dockerode": "^4.0.2",
     "inquirer": "^9.2.23",
-    "shelljs": "^0.8.5"
+    "shelljs": "^0.8.5",
+    "ora": "^8.0.1"
   },
   "type": "module",
-  "devDependencies": {
-    "ora": "^8.0.1"
-  }
+  "keywords": [
+    "docker",
+    "deploy",
+    "cli",
+    "container",
+    "management",
+    "devops"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MSamor/DockerAutoDeploy.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MSamor/DockerAutoDeploy/issues"
+  },
+  "homepage": "https://github.com/MSamor/DockerAutoDeploy#readme"
 }
