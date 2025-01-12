@@ -40,7 +40,12 @@ maosi init
       "hostPort": 80,  // 可选，
       "containerPort": 80,  // 可选，
       "hostVolume": "/path/to/host/dir",     // 可选，主机挂载目录
-      "containerVolume": "/path/to/container" // 可选，容器挂载目录
+      "containerVolume": "/path/to/container", // 可选，容器挂载目录
+      "env": [                               // 可选，环境变量
+        "NGINX_HOST=example.com",
+        "NGINX_PORT=80"
+      ],
+      "restartPolicy": "always"              // 可选，容器重启策略
     }
   ],
   "private": [                      // 私有镜像配置（可选）
@@ -55,7 +60,12 @@ maosi init
       "hostPort": 80,               // 主机端口（可选）
       "containerPort": 80,          // 容器端口（可选）
       "hostVolume": "/path/to/host/private",      // 主机挂载目录（可选）
-      "containerVolume": "/path/to/container/private"  // 容器挂载目录（可选）
+      "containerVolume": "/path/to/container/private",  // 容器挂载目录（可选）
+      "env": [                               // 可选，环境变量
+        "NGINX_HOST=example.com",
+        "NGINX_PORT=80"
+      ],
+      "restartPolicy": "always"              // 可选，容器重启策略
     }
   ],
   "host": "127.0.0.1",             // Docker守护进程主机地址
@@ -73,6 +83,12 @@ maosi init
   - `containerPort`: 容器端口（可选）
   - `hostVolume`: 主机挂载目录（可选）
   - `containerVolume`: 容器挂载目录（可选）
+  - `env`: 环境变量数组（可选）
+  - `restartPolicy`: 容器重启策略（可选）
+    - `no`: 不自动重启
+    - `always`: 总是重启
+    - `on-failure`: 失败时重启
+    - `unless-stopped`: 除非手动停止否则总是重启
 
 - `private`: 私有镜像配置数组（可选）
   - 包含所有公共镜像配置项
@@ -104,6 +120,8 @@ maosi
   - 自动拉取最新镜像
   - 配置端口映射（可选）
   - 配置目录挂载（可选）
+  - 配置环境变量（可选）
+  - 配置重启策略（可选）
 
 - **🔄 回滚镜像**
   - 查看可用版本
@@ -130,7 +148,9 @@ maosi
    ```
    选择操作 > 部署服务
    选择配置 > 选择镜像
-   确认端口（可选）> 确认挂载目录（可选）> 执行部署
+   确认端口（可选）> 确认挂载目录（可选）
+   确认环境变量（可选）> 确认重启策略（可选）
+   执行部署
    ```
 
 2. **管理现有容器**
