@@ -1,32 +1,28 @@
 {
   "name": "docker-auto-deploy",
   "version": "1.0.0",
-  "description": "docker部署的cli命令行工具",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "bin": {
-    "maosi": "./index.js"
-  },
-  "author": "Maosi",
-  "license": "MIT",
-  "dependencies": {
-    "chalk": "^5.3.0",
-    "dockerode": "^4.0.2",
-    "inquirer": "^9.2.23",
-    "shelljs": "^0.8.5",
-    "ora": "^8.0.1"
-  },
+  "description": "一个强大的 Docker 容器管理工具，提供直观的命令行界面，帮助您轻松管理 Docker 容器的部署、回滚和监控。",
+  "main": "src/index.js",
   "type": "module",
+  "bin": {
+    "maosi": "./bin/cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js"
+  },
   "keywords": [
     "docker",
     "deploy",
-    "cli",
     "container",
-    "management",
-    "devops"
+    "cli",
+    "devops",
+    "automation"
   ],
+  "author": {
+    "name": "Maosi",
+    "url": "https://github.com/MSamor"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MSamor/DockerAutoDeploy.git"
@@ -34,5 +30,13 @@
   "bugs": {
     "url": "https://github.com/MSamor/DockerAutoDeploy/issues"
   },
-  "homepage": "https://github.com/MSamor/DockerAutoDeploy#readme"
+  "homepage": "https://github.com/MSamor/DockerAutoDeploy",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "dockerode": "^4.0.2",
+    "inquirer": "^9.2.23",
+    "shelljs": "^0.8.5",
+    "ora": "^8.0.1"
+  }
 }
