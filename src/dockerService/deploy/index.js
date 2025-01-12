@@ -89,6 +89,13 @@ async function createContainer(dockerInstance, deployConfigRes) {
             containerConfig.HostConfig.PortBindings = portBindings;
         }
 
+        // 添加挂载目录配置
+        if (deployConfigRes.hostVolume && deployConfigRes.containerVolume) {
+            containerConfig.HostConfig.Binds = [
+                `${deployConfigRes.hostVolume}:${deployConfigRes.containerVolume}`
+            ];
+        }
+
         dockerInstance.createContainer(containerConfig, function(err, container) {
             if (err) {
                 console.log(Chalk.redBright.bold('容器启动失败！原因：' + err.message));
@@ -150,7 +157,7 @@ export default async function deployService(dockerInstance, deployConfigRes) {
                 name: 'hostPort',
                 default: deployConfigRes?.hostPort?.toString() || '',
                 validate: function(value) {
-                    if (!value) return true; // 允许空值
+                    if (!value || !value.trim()) return true; // 允许空值或空格
                     const port = parseInt(value);
                     if (isNaN(port) || port < 1 || port > 65535) {
                         return '请输入有效的端口号（1-65535）或留空';
@@ -164,7 +171,7 @@ export default async function deployService(dockerInstance, deployConfigRes) {
                 name: 'containerPort',
                 default: deployConfigRes?.containerPort?.toString() || '',
                 validate: function(value) {
-                    if (!value) return true; // 允许空值
+                    if (!value || !value.trim()) return true; // 允许空值或空格
                     const port = parseInt(value);
                     if (isNaN(port) || port < 1 || port > 65535) {
                         return '请输入有效的端口号（1-65535）或留空';
@@ -173,16 +180,49 @@ export default async function deployService(dockerInstance, deployConfigRes) {
                 }
             }
         ];
+
+        // 添加挂载目录配置
+        const volumePrompt = [
+            {
+                type: 'input',
+                message: '请确认主机挂载目录路径，留空则不挂载',
+                name: 'hostVolume',
+                default: deployConfigRes?.hostVolume || '',
+            },
+            {
+                type: 'input',
+                message: '请确认容器挂载目录路径，留空则不挂载',
+                name: 'containerVolume',
+                default: deployConfigRes?.containerVolume || '',
+                when: (answers) => answers.hostVolume && answers.hostVolume.trim() !== '' // 只有当主机目录不为空且不全是空格时才询问容器目录
+            }
+        ];
+        
         const portAnswers = await inquirer.prompt(portPrompt);
+        const volumeAnswers = await inquirer.prompt(volumePrompt);
         
         // 更新端口配置
-        deployConfigRes.hostPort = portAnswers.hostPort ? parseInt(portAnswers.hostPort) : undefined;
-        deployConfigRes.containerPort = portAnswers.containerPort ? parseInt(portAnswers.containerPort) : undefined;
+        const hostPort = portAnswers.hostPort?.trim();
+        const containerPort = portAnswers.containerPort?.trim();
+        deployConfigRes.hostPort = hostPort ? parseInt(hostPort) : undefined;
+        deployConfigRes.containerPort = containerPort ? parseInt(containerPort) : undefined;
+
+        // 更新挂载配置
+        const hostVolume = volumeAnswers.hostVolume?.trim();
+        const containerVolume = volumeAnswers.containerVolume?.trim();
+        deployConfigRes.hostVolume = hostVolume || undefined;
+        deployConfigRes.containerVolume = containerVolume || undefined;
 
         if (!deployConfigRes.hostPort || !deployConfigRes.containerPort) {
             console.log(Chalk.blueBright.bold('将以不开放端口的形式运行容器'));
             deployConfigRes.hostPort = undefined;
             deployConfigRes.containerPort = undefined;
+        }
+
+        if (!deployConfigRes.hostVolume || !deployConfigRes.containerVolume) {
+            console.log(Chalk.blueBright.bold('将以不挂载目录的形式运行容器'));
+            deployConfigRes.hostVolume = undefined;
+            deployConfigRes.containerVolume = undefined;
         }
 
         try {

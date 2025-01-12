@@ -86,6 +86,8 @@ export default async function deployConfig(configJson) {
         fullImageUrl,
         auth,
         hostPort,
-        containerPort
+        containerPort,
+        hostVolume: selectedImage.hostVolume,
+        containerVolume: selectedImage.containerVolume
     }
 }
