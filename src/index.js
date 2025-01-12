@@ -50,6 +50,8 @@ export async function index() {
 ║     🚀 Docker Auto Deploy System v1.0.0      ║
 ║        Powered by ${chalk.greenBright('Maosi Technology')}           ║
 ║                                              ║
+║  ${chalk.yellowBright('https://github.com/MSamor/DockerAutoDeploy')}  ║
+║                                              ║
 ╚══════════════════════════════════════════════╝
 `));
         // 连接docker

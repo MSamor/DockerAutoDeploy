@@ -2,6 +2,8 @@
 
 一个强大的 Docker 容器管理工具，提供直观的命令行界面，帮助您轻松管理 Docker 容器的部署、回滚和监控。
 
+🔗 **项目地址**: [https://github.com/MSamor/DockerAutoDeploy](https://github.com/MSamor/DockerAutoDeploy)
+
 ## ✨ 特性
 
 - 🚀 **快速部署** - 轻松部署 Docker 容器，支持公共和私有镜像
@@ -10,6 +12,7 @@
 - 🛠️ **容器管理** - 便捷的容器启动、停止和删除操作
 - 🧹 **空间清理** - 自动清理未使用的镜像，释放磁盘空间
 - 📝 **配置灵活** - 支持自定义配置文件，方便管理多个部署环境
+- 📂 **目录挂载** - 支持容器目录挂载，方便数据持久化和配置管理
 
 ## 📦 安装
 
@@ -29,7 +32,9 @@ npm install -g docker-auto-deploy
       "imageName": "nginx",
       "serveraddress": "docker.io",
       "hostPort": 80,
-      "containerPort": 80
+      "containerPort": 80,
+      "hostVolume": "/path/to/host/dir",     // 可选，主机挂载目录
+      "containerVolume": "/path/to/container" // 可选，容器挂载目录
     }
   ],
   "private": [
@@ -40,7 +45,9 @@ npm install -g docker-auto-deploy
       "password": "password",
       "auth": "auth-token",
       "email": "your@email.com",
-      "serveraddress": "private-registry.com"
+      "serveraddress": "private-registry.com",
+      "hostVolume": "/path/to/host/dir",     // 可选，主机挂载目录
+      "containerVolume": "/path/to/container" // 可选，容器挂载目录
     }
   ]
 }
@@ -55,6 +62,8 @@ npm install -g docker-auto-deploy
   - `hostPort`: 主机端口（可选）
   - `containerPort`: 容器端口（可选）
   - `tag`: 镜像标签（可选，默认 latest）
+  - `hostVolume`: 主机挂载目录（可选）
+  - `containerVolume`: 容器挂载目录（可选）
 
 - **private**: 私有镜像配置
   - 包含公共配置的所有字段
@@ -69,10 +78,8 @@ npm install -g docker-auto-deploy
 
 ```bash
 # 启动工具
-docker-auto-deploy
+maosi
 
-# 查看帮助
-docker-auto-deploy --help
 ```
 
 ### 功能菜单
@@ -80,7 +87,8 @@ docker-auto-deploy --help
 - **🚢 部署服务**
   - 选择并部署 Docker 容器
   - 自动拉取最新镜像
-  - 配置端口映射
+  - 配置端口映射（可选）
+  - 配置目录挂载（可选）
 
 - **🔄 回滚镜像**
   - 查看可用版本
@@ -107,7 +115,7 @@ docker-auto-deploy --help
    ```
    选择操作 > 部署服务
    选择配置 > 选择镜像
-   确认端口 > 执行部署
+   确认端口（可选）> 确认挂载目录（可选）> 执行部署
    ```
 
 2. **管理现有容器**
@@ -140,5 +148,5 @@ docker-auto-deploy --help
 
 ## 🔗 相关链接
 
-- [问题反馈](https://github.com/yourusername/docker-auto-deploy/issues)
+- [问题反馈](https://github.com/MSamor/DockerAutoDeploy/issues)
 - [更新日志](CHANGELOG.md)
