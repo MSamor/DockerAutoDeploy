@@ -22,55 +22,67 @@ npm install -g docker-auto-deploy
 
 ## ⚙️ 配置
 
-在项目根目录创建 `config.json` 文件：
+使用以下命令生成默认配置文件：
+
+```bash
+maosi init
+```
+
+这将在当前目录下创建 `config.json` 文件。配置文件结构如下：
 
 ```json
 {
   "public": [
     {
-      "name": "应用名称",
-      "imageName": "nginx",
-      "serveraddress": "docker.io",
-      "hostPort": 80,
-      "containerPort": 80,
+      "name": "示例公共镜像",        // 应用名称
+      "imageName": "nginx",         // 镜像名称
+      "serveraddress": "docker.m.daocloud.io",  // 镜像仓库地址
+      "hostPort": 80,  // 可选，
+      "containerPort": 80,  // 可选，
       "hostVolume": "/path/to/host/dir",     // 可选，主机挂载目录
       "containerVolume": "/path/to/container" // 可选，容器挂载目录
     }
   ],
-  "private": [
+  "private": [                      // 私有镜像配置（可选）
     {
-      "name": "私有应用",
-      "imageName": "private-app",
-      "username": "user",
-      "password": "password",
-      "auth": "auth-token",
-      "email": "your@email.com",
-      "serveraddress": "private-registry.com",
-      "hostVolume": "/path/to/host/dir",     // 可选，主机挂载目录
-      "containerVolume": "/path/to/container" // 可选，容器挂载目录
+      "name": "示例私有镜像",
+      "imageName": "nginx",
+      "username": "your-username",   // 私有仓库用户名
+      "password": "your-password",   // 私有仓库密码
+      "auth": "token",              // 认证令牌
+      "email": "your@email.com",    // 邮箱
+      "serveraddress": "index.docker.io/v1",  // 私有仓库地址
+      "hostPort": 80,               // 主机端口（可选）
+      "containerPort": 80,          // 容器端口（可选）
+      "hostVolume": "/path/to/host/private",      // 主机挂载目录（可选）
+      "containerVolume": "/path/to/container/private"  // 容器挂载目录（可选）
     }
-  ]
+  ],
+  "host": "127.0.0.1",             // Docker守护进程主机地址
+  "port": "2375"                   // Docker守护进程端口
 }
 ```
 
 ### 配置说明
 
-- **public**: 公共镜像配置
+- `public`: 公共镜像配置数组（必需）
   - `name`: 应用名称
   - `imageName`: 镜像名称
-  - `serveraddress`: 镜像服务器地址
+  - `serveraddress`: 镜像仓库地址
   - `hostPort`: 主机端口（可选）
   - `containerPort`: 容器端口（可选）
-  - `tag`: 镜像标签（可选，默认 latest）
   - `hostVolume`: 主机挂载目录（可选）
   - `containerVolume`: 容器挂载目录（可选）
 
-- **private**: 私有镜像配置
-  - 包含公共配置的所有字段
-  - `username`: 登录用户名
-  - `password`: 登录密码
-  - `auth`: 认证令牌
-  - `email`: 邮箱地址
+- `private`: 私有镜像配置数组（可选）
+  - 包含所有公共镜像配置项
+  - `username`: 私有仓库用户名（必需）
+  - `password`: 私有仓库密码（必需）
+  - `auth`: 认证令牌（必需）
+  - `email`: 邮箱地址（必需）
+
+- `host`: Docker守护进程主机地址
+- `port`: Docker守护进程端口
 
 ## 🚀 使用指南
 
@@ -79,8 +91,11 @@ npm install -g docker-auto-deploy
 ```bash
 # 启动工具
 maosi
-
 ```
+
+### 图片示例
+
+![示例图](./image/example.png)
 
 ### 功能菜单
 
