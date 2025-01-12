@@ -29,6 +29,6 @@ export default async function param() {
         }
         return await promptAction();
     }
-    
+
     return paramFromCli;
 }

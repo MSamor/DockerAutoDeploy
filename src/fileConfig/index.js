@@ -20,17 +20,19 @@ function validateConfig(config) {
         });
     }
 
-    // 检查 private 配置
-    if (!Array.isArray(config.private)) {
-        errors.push('private 字段必须是数组');
-    } else {
-        config.private.forEach((item, index) => {
-            privateRequiredFields.forEach(field => {
-                if (!item[field]) {
-                    errors.push(`private[${index}] 缺少必需的 ${field} 字段`);
-                }
+    // 检查 private 配置（如果存在）
+    if (config.hasOwnProperty('private')) {
+        if (!Array.isArray(config.private)) {
+            errors.push('private 字段必须是数组');
+        } else {
+            config.private.forEach((item, index) => {
+                privateRequiredFields.forEach(field => {
+                    if (!item[field]) {
+                        errors.push(`private[${index}] 缺少必需的 ${field} 字段`);
+                    }
+                });
             });
-        });
+        }
     }
 
     return errors;
@@ -64,6 +66,6 @@ export default async function config() {
             return null;
         }
     }
-    console.log(Chalk.yellowBright.bold('配置文件不存在，请先初始化配置！！'));
+    console.log(Chalk.yellowBright.bold('配置文件不存在，请先执行'+Chalk.green.bold('\'maosi init\'')+'初始化配置！！'));
     return null;
 }

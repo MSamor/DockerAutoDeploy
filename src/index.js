@@ -8,6 +8,7 @@ import rollbackContainer from './dockerService/rollback/index.js';
 import deployService from "./dockerService/deploy/index.js";
 import deployConfig from "./executeConfig/deploy/index.js";
 import manageContainer from './dockerService/manage/index.js';
+import init from './executeConfig/init/index.js';
 
 async function executeAction(action, dockerInstance, configJson) {
     switch (action) {
@@ -37,6 +38,12 @@ async function executeAction(action, dockerInstance, configJson) {
 
 export async function index() {
     try {
+        // 检查是否是init命令
+        if (process.argv[2] === 'init') {
+            await init();
+            return;
+        }
+
         // 获取配置文件
         const configJson = await config();
         if (!configJson) {

@@ -1,9 +1,9 @@
-{
+export const defaultConfig = {
   "public": [
     {
       "name": "示例公共镜像",
       "imageName": "nginx",
-      "serveraddress": "docker.m.daocloud.io"
+      "serveraddress": "docker.m.daocloud.io",
     }
   ],
   "private": [
