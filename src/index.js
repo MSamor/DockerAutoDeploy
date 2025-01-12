@@ -54,7 +54,7 @@ export async function index() {
         console.log(chalk.cyanBright.bold(`
 ╔══════════════════════════════════════════════╗
 ║                                              ║
-║     🚀 Docker Auto Deploy System v1.0.1      ║
+║     🚀 Docker Auto Deploy System v1.0.4      ║
 ║        Powered by ${chalk.greenBright('Maosi Technology')}           ║
 ║                                              ║
 ║  ${chalk.yellowBright('https://github.com/MSamor/DockerAutoDeploy')}  ║

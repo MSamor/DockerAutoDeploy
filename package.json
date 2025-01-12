@@ -1,6 +1,6 @@
 {
   "name": "docker-auto-deploy",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "一个强大的 Docker 容器管理工具，提供直观的命令行界面，帮助您轻松管理 Docker 容器的部署、回滚和监控。",
   "main": "src/index.js",
   "type": "module",
