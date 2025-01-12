@@ -3,7 +3,12 @@
     {
       "name": "示例公共镜像",
       "imageName": "nginx",
-      "serveraddress": "docker.m.daocloud.io"
+      "serveraddress": "docker.m.daocloud.io",
+      "env": [
+        "NGINX_HOST=example.com",
+        "NGINX_PORT=80"
+      ],
+      "restartPolicy": "always"
     }
   ],
   "private": [
@@ -22,5 +27,5 @@
     }
   ],
   "host": "127.0.0.1",
-  "port": "2375"
+  "port": "2376"
 }

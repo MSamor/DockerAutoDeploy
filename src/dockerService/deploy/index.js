@@ -96,6 +96,18 @@ async function createContainer(dockerInstance, deployConfigRes) {
             ];
         }
 
+        // 添加环境变量配置
+        if (deployConfigRes.env && Array.isArray(deployConfigRes.env)) {
+            containerConfig.Env = deployConfigRes.env;
+        }
+
+        // 添加重启策略配置
+        if (deployConfigRes.restartPolicy) {
+            containerConfig.HostConfig.RestartPolicy = {
+                Name: deployConfigRes.restartPolicy
+            };
+        }
+
         dockerInstance.createContainer(containerConfig, function(err, container) {
             if (err) {
                 console.log(Chalk.redBright.bold('容器启动失败！原因：' + err.message));
@@ -200,12 +212,80 @@ export default async function deployService(dockerInstance, deployConfigRes) {
         
         const portAnswers = await inquirer.prompt(portPrompt);
         const volumeAnswers = await inquirer.prompt(volumePrompt);
-        
-        // 更新端口配置
-        const hostPort = portAnswers.hostPort?.trim();
-        const containerPort = portAnswers.containerPort?.trim();
-        deployConfigRes.hostPort = hostPort ? parseInt(hostPort) : undefined;
-        deployConfigRes.containerPort = containerPort ? parseInt(containerPort) : undefined;
+
+        // 环境变量配置确认
+        let envConfirmPrompt = [];
+        if (deployConfigRes.env && Array.isArray(deployConfigRes.env) && deployConfigRes.env.length > 0) {
+            envConfirmPrompt = [
+                {
+                    type: 'confirm',
+                    message: '是否需要配置环境变量？',
+                    name: 'needEnv',
+                    default: true
+                }
+            ];
+            
+            const envConfirmAnswer = await inquirer.prompt(envConfirmPrompt);
+            
+            if (envConfirmAnswer.needEnv) {
+                const envPrompt = deployConfigRes.env.map((env, index) => {
+                    const [key, defaultValue] = env.split('=');
+                    return {
+                        type: 'input',
+                        message: `请确认环境变量 ${key}`,
+                        name: `env_${index}`,
+                        default: defaultValue || '',
+                    };
+                });
+                
+                const envAnswers = await inquirer.prompt(envPrompt);
+                deployConfigRes.env = Object.entries(envAnswers).map((([key, value], index) => {
+                    const envKey = deployConfigRes.env[index].split('=')[0];
+                    return `${envKey}=${value}`;
+                }));
+                console.log(Chalk.blueBright.bold('已配置环境变量'));
+            } else {
+                deployConfigRes.env = undefined;
+                console.log(Chalk.blueBright.bold('将不配置环境变量'));
+            }
+        }
+
+        // 重启策略配置确认
+        let restartPolicyConfirmPrompt = [];
+        if (deployConfigRes.restartPolicy) {
+            restartPolicyConfirmPrompt = [
+                {
+                    type: 'confirm',
+                    message: '是否需要配置重启策略？',
+                    name: 'needRestartPolicy',
+                    default: true
+                }
+            ];
+            
+            const restartConfirmAnswer = await inquirer.prompt(restartPolicyConfirmPrompt);
+            
+            if (restartConfirmAnswer.needRestartPolicy) {
+                const restartPolicyPrompt = {
+                    type: 'list',
+                    message: '请选择容器重启策略',
+                    name: 'restartPolicy',
+                    default: deployConfigRes.restartPolicy,
+                    choices: [
+                        { name: '不自动重启', value: 'no' },
+                        { name: '总是重启', value: 'always' },
+                        { name: '失败时重启', value: 'on-failure' },
+                        { name: '除非手动停止否则总是重启', value: 'unless-stopped' }
+                    ]
+                };
+                
+                const restartAnswer = await inquirer.prompt(restartPolicyPrompt);
+                deployConfigRes.restartPolicy = restartAnswer.restartPolicy;
+                console.log(Chalk.blueBright.bold(`已配置重启策略: ${restartAnswer.restartPolicy}`));
+            } else {
+                deployConfigRes.restartPolicy = undefined;
+                console.log(Chalk.blueBright.bold('将不配置重启策略'));
+            }
+        }
 
         // 更新挂载配置
         const hostVolume = volumeAnswers.hostVolume?.trim();
@@ -224,6 +304,12 @@ export default async function deployService(dockerInstance, deployConfigRes) {
             deployConfigRes.hostVolume = undefined;
             deployConfigRes.containerVolume = undefined;
         }
+
+        // 更新端口配置
+        const hostPort = portAnswers.hostPort?.trim();
+        const containerPort = portAnswers.containerPort?.trim();
+        deployConfigRes.hostPort = hostPort ? parseInt(hostPort) : undefined;
+        deployConfigRes.containerPort = containerPort ? parseInt(containerPort) : undefined;
 
         try {
             const oraLoading = ora(Chalk.yellowBright.bold('容器部署中,请稍后...\n'))

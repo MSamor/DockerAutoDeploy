@@ -7,17 +7,19 @@ function validateConfig(config) {
     const privateRequiredFields = [...commonRequiredFields, 'username', 'password', 'auth', 'email'];
     const errors = [];
 
-    // 检查 public 配置
-    if (!Array.isArray(config.public)) {
-        errors.push('public 字段必须是数组');
-    } else {
-        config.public.forEach((item, index) => {
-            commonRequiredFields.forEach(field => {
-                if (!item[field]) {
-                    errors.push(`public[${index}] 缺少必需的 ${field} 字段`);
-                }
+    // 检查 public 配置（如果存在）
+    if (config.hasOwnProperty('public')) {
+        if (!Array.isArray(config.public)) {
+            errors.push('public 字段必须是数组');
+        } else {
+            config.public.forEach((item, index) => {
+                commonRequiredFields.forEach(field => {
+                    if (!item[field]) {
+                        errors.push(`public[${index}] 缺少必需的 ${field} 字段`);
+                    }
+                });
             });
-        });
+        }
     }
 
     // 检查 private 配置（如果存在）

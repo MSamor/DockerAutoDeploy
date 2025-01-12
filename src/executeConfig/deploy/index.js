@@ -1,7 +1,18 @@
 import Inquirer from "inquirer";
 import {getPrivateByName, getPrivateName, getPublicByName, getPublicName} from "../../../utils/jsonUtils.js";
+import Chalk from 'chalk';
 
 export default async function deployConfig(configJson) {
+    // 检查是否配置了任何镜像
+    const hasPublicImages = configJson.public && Array.isArray(configJson.public) && configJson.public.length > 0;
+    const hasPrivateImages = configJson.private && Array.isArray(configJson.private) && configJson.private.length > 0;
+
+    if (!hasPublicImages && !hasPrivateImages) {
+        console.log(Chalk.yellow('警告：未配置任何镜像。请在配置文件中添加至少一个公共或私有镜像配置。'));
+        console.log(Chalk.blue('提示：可以参考 src/meta/fullConfig.js 中的示例配置。'));
+        return;
+    }
+
     // 填写容器镜像名称
     let imageName = ''
     let imageUrl = ''
@@ -13,15 +24,16 @@ export default async function deployConfig(configJson) {
     let auth = {}
 
     // 执行部署命令
+    const choices = [];
+    if (hasPublicImages) choices.push("public");
+    if (hasPrivateImages) choices.push("private");
+
     const promptList = [
         {
             type: 'list',
             message: '请选择镜像仓库来源',
             name: 'source',
-            choices: [
-                "public",
-                "private",
-            ],
+            choices,
         },
     ];
     const answers = await Inquirer.prompt(promptList)
@@ -88,6 +100,8 @@ export default async function deployConfig(configJson) {
         hostPort,
         containerPort,
         hostVolume: selectedImage.hostVolume,
-        containerVolume: selectedImage.containerVolume
+        containerVolume: selectedImage.containerVolume,
+        env: selectedImage.env,
+        restartPolicy: selectedImage.restartPolicy
     }
 }
