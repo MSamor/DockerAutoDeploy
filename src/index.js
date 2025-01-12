@@ -52,12 +52,11 @@ export async function index() {
 ║                                              ║
 ╚══════════════════════════════════════════════╝
 `));
+        // 连接docker
+        const dockerInstance = await dockerConnect(configJson);
         
         // 获取要执行的操作（从命令行或交互式菜单）
         const action = await param();
-
-        // 连接docker
-        const dockerInstance = await dockerConnect(configJson);
         
         // 执行对应的操作
         await executeAction(action, dockerInstance, configJson);

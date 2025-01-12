@@ -10,7 +10,7 @@
     },
     {
       "name": "腾讯云镜像2",
-      "imageName": "nginx",
+      "imageName": "memcached",
       "serveraddress": "docker.1ms.run"
     }
   ],

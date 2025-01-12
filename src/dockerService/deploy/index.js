@@ -70,21 +70,26 @@ async function pullImage(dockerInstance, deployConfigRes, spinner) {
 
 async function createContainer(dockerInstance, deployConfigRes) {
     return new Promise((resolve, reject) => {
-        const containerPort = `${deployConfigRes.containerPort}/tcp`;
-        const portBindings = {};
-        portBindings[containerPort] = [{ HostPort: deployConfigRes.hostPort.toString() }];
-
-        dockerInstance.createContainer({
+        const containerConfig = {
             Image: deployConfigRes.fullImageUrl,
-            ExposedPorts: {
-                [containerPort]: {}
-            },
             name: deployConfigRes.name,
             Tty: true,
-            HostConfig: {
-                PortBindings: portBindings
-            }
-        }, function(err, container) {
+            HostConfig: {}
+        };
+
+        // 只有当设置了端口时才配置端口映射
+        if (deployConfigRes.containerPort && deployConfigRes.hostPort) {
+            const containerPort = `${deployConfigRes.containerPort}/tcp`;
+            const portBindings = {};
+            portBindings[containerPort] = [{ HostPort: deployConfigRes.hostPort.toString() }];
+
+            containerConfig.ExposedPorts = {
+                [containerPort]: {}
+            };
+            containerConfig.HostConfig.PortBindings = portBindings;
+        }
+
+        dockerInstance.createContainer(containerConfig, function(err, container) {
             if (err) {
                 console.log(Chalk.redBright.bold('容器启动失败！原因：' + err.message));
                 reject(err);
@@ -97,8 +102,7 @@ async function createContainer(dockerInstance, deployConfigRes) {
                         reject(err);
                         return;
                     }
-                    console.log(Chalk.greenBright.bold('容器启动成功'));
-                    resolve();
+                    resolve(container);
                 });
             }
         });
@@ -142,26 +146,28 @@ export default async function deployService(dockerInstance, deployConfigRes) {
         const portPrompt = [
             {
                 type: 'input',
-                message: '请确认主机端口(Host Port)',
+                message: '请确认主机端口(Host Port)，留空则不开放端口',
                 name: 'hostPort',
-                default: deployConfigRes?.hostPort?.toString() || '80',
+                default: deployConfigRes?.hostPort?.toString() || '',
                 validate: function(value) {
+                    if (!value) return true; // 允许空值
                     const port = parseInt(value);
                     if (isNaN(port) || port < 1 || port > 65535) {
-                        return '请输入有效的端口号（1-65535）';
+                        return '请输入有效的端口号（1-65535）或留空';
                     }
                     return true;
                 }
             },
             {
                 type: 'input',
-                message: '请确认容器端口(Container Port)',
+                message: '请确认容器端口(Container Port)，留空则不开放端口',
                 name: 'containerPort',
-                default: deployConfigRes?.containerPort?.toString() || '80',
+                default: deployConfigRes?.containerPort?.toString() || '',
                 validate: function(value) {
+                    if (!value) return true; // 允许空值
                     const port = parseInt(value);
                     if (isNaN(port) || port < 1 || port > 65535) {
-                        return '请输入有效的端口号（1-65535）';
+                        return '请输入有效的端口号（1-65535）或留空';
                     }
                     return true;
                 }
@@ -170,10 +176,24 @@ export default async function deployService(dockerInstance, deployConfigRes) {
         const portAnswers = await inquirer.prompt(portPrompt);
         
         // 更新端口配置
-        deployConfigRes.hostPort = parseInt(portAnswers.hostPort);
-        deployConfigRes.containerPort = parseInt(portAnswers.containerPort);
+        deployConfigRes.hostPort = portAnswers.hostPort ? parseInt(portAnswers.hostPort) : undefined;
+        deployConfigRes.containerPort = portAnswers.containerPort ? parseInt(portAnswers.containerPort) : undefined;
 
-        await createContainer(dockerInstance, deployConfigRes);
+        if (!deployConfigRes.hostPort || !deployConfigRes.containerPort) {
+            console.log(Chalk.blueBright.bold('将以不开放端口的形式运行容器'));
+            deployConfigRes.hostPort = undefined;
+            deployConfigRes.containerPort = undefined;
+        }
+
+        try {
+            const oraLoading = ora(Chalk.yellowBright.bold('容器部署中,请稍后...\n'))
+            oraLoading.start()
+            await createContainer(dockerInstance, deployConfigRes);
+            oraLoading.succeed(Chalk.greenBright.bold('容器部署成功！'));
+        } catch (error) {
+            console.error(Chalk.redBright.bold('容器部署失败：'), error);
+            throw error;
+        }
     } else {
         console.log(Chalk.yellowBright.bold('取消部署,需手动部署'));
     }
